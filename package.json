@@ -1,0 +1,20 @@
+{
+  "name": "my-motivation",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev:front": "npm run --prefix frontend dev",
+    "dev:back": "npm run --prefix backend dev",
+    "install:front": "npm install --prefix frontend",
+    "install:back": "npm install --prefix backend",
+    "install:all": "concurrently  \"npm install\" \"npm run install:front\" \"npm run install:back\"",
+    "start:dev": "concurrently \"npm run dev:front\" \"npm run dev:back\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
+}
