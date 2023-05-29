@@ -1,2 +1,2 @@
-export {default as PostController} from './PostController.js'
-export {default as GetController} from './GetController.js'
+export {default as AuthController} from './AuthController.js'
+export {default as EmployeeController} from './EmployeeController.js'
