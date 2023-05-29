@@ -8,14 +8,13 @@ import store from './store/index.ts';
 
 const theme = createTheme();
 
-
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
 			<Provider store={store}>
-      <App />
-      </Provider>
+				<App />
+			</Provider>
 		</ThemeProvider>
 	</React.StrictMode>,
 );
