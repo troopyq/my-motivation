@@ -6,6 +6,8 @@ import { RowDataPacket } from 'mysql2/promise';
 import jwt from 'jsonwebtoken';
 import config from 'config';
 import { logtime } from '../utils/logtime';
+import { parseCookie } from '../utils/cookie';
+import { Res } from '../types';
 
 export type AuthParams = {
 	login: string;
@@ -45,8 +47,32 @@ class AuthController {
 		 `);
 
 			const token = generateAccessToken(user.id, employee.role);
-			res.cookie('token', token, {maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true})
+			// res.cookie('token', token, {maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true})
+			res.cookie('token', token, { maxAge: 30 * 1000, httpOnly: true });
 			return res.status(200).json({ status: true, data: { token, id: user.id } });
+		} catch (e) {
+			error(req, res, e);
+		}
+	}
+
+	async checkAuth(req: Request, res: Response) {
+		try {
+			const token =
+				req.headers?.authorization?.split(' ')?.[1] || parseCookie(req.headers?.cookie)?.token;
+			logtime(req, token);
+
+			if (!token) {
+				return res.status(403).json({ status: false, error: 'Пользователь не авторизован' } as Res);
+			}
+
+			const decodeData = jwt.verify(token, config.get('secret'));
+			const tok = jwt.decode(token);
+
+			logtime(req, { decodeData, tok });
+
+			req.body.user = decodeData;
+			res.cookie('token', token, { maxAge: 30 * 1000, httpOnly: true });
+			return res.status(200).json({ status: true });
 		} catch (e) {
 			error(req, res, e);
 		}

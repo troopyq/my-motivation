@@ -9,7 +9,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 	if (req.method === 'OPTIONS') next();
 
 	try {
-		const token = req.headers.authorization?.split(' ')?.[1] || parseCookie(req.headers.cookie)?.token;
+		const token = req.headers?.authorization?.split(' ')?.[1] || parseCookie(req.headers?.cookie)?.token; 
     logtime(req, token);
 
 		if (!token) {

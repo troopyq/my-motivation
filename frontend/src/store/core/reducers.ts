@@ -1,4 +1,5 @@
 import { LoadingState } from '../types';
+import { initialState } from './constants';
 import { ReducerFunction, User } from './types';
 import { AuthParams } from './types';
 
@@ -16,6 +17,7 @@ const authSuccess: ReducerFunction<User | undefined> = (state, { payload }) => {
 };
 
 const authFailed: ReducerFunction<string> = (state, { payload }) => {
+	state.user = initialState.user;
 	state.formAuth.isLoading = LoadingState.REJECT;
 	state.formAuth.error = payload;
 };

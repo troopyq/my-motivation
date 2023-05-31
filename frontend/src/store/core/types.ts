@@ -21,14 +21,15 @@ export type User = {
 	vacation_days?: Nnumber;
 	position_days?: Nnumber;
 	user_id?: number;
-  isLoaded: boolean;
-}
+	isLoaded: boolean;
+	token?: Nstring;
+};
 
 export type CoreState = {
 	header: {
 		title: string;
 	};
-	user: User,
+	user: User;
 	formAuth: {
 		isLoading: LoadingState | '';
 		error: Nstring;

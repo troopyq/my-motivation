@@ -1,16 +1,13 @@
 import axios from 'axios';
 
-
-
 const api = axios.create({
 	withCredentials: true,
-  proxy: {
-    host: 'localhost',
-    port: 8000,
-  },
-
-	baseURL: 'http://localhost:8000/api',
-	headers: { 'Content-Type': 'application/json' },
+	// baseURL: 'http://localhost:3000/api',
+	baseURL: 'http://localhost:3000/api',
+	headers: {
+		'Content-Type': 'application/json;charset=UTF-8',
+		'Access-Control-Allow-Origin': '*',
+	},
 });
 
 api.interceptors.request.use((config) => {

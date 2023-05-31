@@ -4,6 +4,7 @@ import { coreActions } from './actions';
 import { AuthParams, AuthResponse, User } from './types';
 import { call } from '../../utils/saga';
 import api from '../../utils/api/idnex';
+import axios from 'axios';
 
 function* getUser(id?: number) {
 	try {
@@ -18,6 +19,9 @@ function* getUser(id?: number) {
 
 function* auth({ payload }: { payload: AuthParams }) {
 	try {
+		const a = yield* call(() => axios('https://jsonplaceholder.typicode.com/todos/1'));
+		console.log(a);
+
 		const res = yield* call(() => api.post<Response<AuthResponse>>('/auth', payload));
 		if (res && res.status === 200 && res.data.status) {
 			localStorage.setItem('token', res.data.data?.token || '');

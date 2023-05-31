@@ -1,13 +1,16 @@
 import express from 'express';
-import { GetController } from './controllers/index';
+import { AuthController, EmployeeController } from './controllers/index';
+import { authMiddleware } from './middleware/authMiddleware';
+import UserController from './controllers/UserController';
 
 const router = express.Router();
 
-router.use(function timeLog(req, res, next) {
-	console.log('Time: ', Date.now());
-	next();
-});
+router.get('/employees', EmployeeController.employees);
 
-router.get('/employees', GetController.employees);
+router.get('/user', authMiddleware, UserController.getUser);
+
+router.post('/auth', AuthController.auth);
+router.post('/check', AuthController.checkAuth);
+router.get('/check', AuthController.checkAuth);
 
 export { router };
