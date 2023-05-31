@@ -22,7 +22,7 @@ export const generateAccessToken = (id, roles) => {
 		roles,
 	};
 
-	return jwt.sign(payload, config.get('secret') || 'qazwsx', { expiresIn: '24h' });
+	return jwt.sign(payload, config.get('secret') || 'qazwsx', { expiresIn: '1d' });
 };
 
 class AuthController {
@@ -51,11 +51,32 @@ class AuthController {
 			res.cookie('token', token, { maxAge: 30 * 1000, httpOnly: true });
 			return res.status(200).json({ status: true, data: { token, id: user.id } });
 		} catch (e) {
-			error(req, res, e);
+			error(req, res, 500, e);
 		}
 	}
 
 	async checkAuth(req: Request, res: Response) {
+		try {
+			const token =
+				parseCookie(req.headers?.cookie)?.token || req.headers?.authorization?.split(' ')?.[1];
+
+			if (!token) {
+				return res.status(403).json({ status: false, error: 'Пользователь не авторизован' } as Res);
+			}
+
+			const decodeData = jwt.verify(token, config.get('secret')) as any;
+
+			logtime(req, decodeData);
+
+			req.body.user = decodeData;
+			res.cookie('token', token, { maxAge: 30 * 1000, httpOnly: true });
+			return res.status(200).json({ status: true, data: { id: decodeData?.id } });
+		} catch (e) {
+			error(req, res, 401, e);
+		}
+	}
+
+	async logout(req: Request, res: Response) {
 		try {
 			const token =
 				req.headers?.authorization?.split(' ')?.[1] || parseCookie(req.headers?.cookie)?.token;
@@ -65,16 +86,15 @@ class AuthController {
 				return res.status(403).json({ status: false, error: 'Пользователь не авторизован' } as Res);
 			}
 
-			const decodeData = jwt.verify(token, config.get('secret'));
-			const tok = jwt.decode(token);
+			const decodeData = jwt.verify(token, config.get('secret'), { maxAge: 0 });
 
-			logtime(req, { decodeData, tok });
+			logtime(req, { decodeData });
 
 			req.body.user = decodeData;
-			res.cookie('token', token, { maxAge: 30 * 1000, httpOnly: true });
+			res.cookie('token', '', { maxAge: 0, httpOnly: true });
 			return res.status(200).json({ status: true });
 		} catch (e) {
-			error(req, res, e);
+			error(req, res, 401, e);
 		}
 	}
 }

@@ -4,8 +4,8 @@ import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recha
 import Title from './Title';
 
 // Generate Sales Data
-function createData(time: string, amount?: number) {
-  return { time, amount };
+function createData(date: string, amount?: number) {
+  return { date, amount };
 }
 
 const data = [
@@ -25,7 +25,7 @@ export default function Chart() {
 
   return (
     <React.Fragment>
-      <Title>Today</Title>
+      <Title>За неделю</Title>
       <ResponsiveContainer>
         <LineChart
           data={data}
@@ -37,7 +37,7 @@ export default function Chart() {
           }}
         >
           <XAxis
-            dataKey="time"
+            dataKey="date"
             stroke={theme.palette.text.secondary}
             style={theme.typography.body2}
           />
@@ -54,7 +54,7 @@ export default function Chart() {
                 ...theme.typography.body1,
               }}
             >
-              Sales ($)
+              Продажи (руб.)
             </Label>
           </YAxis>
           <Line

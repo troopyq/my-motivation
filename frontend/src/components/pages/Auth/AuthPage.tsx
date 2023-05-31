@@ -76,13 +76,13 @@ export function AuthPage() {
 					</Button>
 					{Boolean(error) && (
 						<Grid container>
-							<Grid item xs>
+							<Grid item xs textAlign="center" color="red">
 								{error}
 							</Grid>
 						</Grid>
 					)}
-					<Grid container>
-						<Grid item xs>
+					<Grid container sx={{mt: 3}}>
+						<Grid item xs textAlign="center">
 							<Link href="#" variant="body2">
 								Забыли пароль?
 							</Link>

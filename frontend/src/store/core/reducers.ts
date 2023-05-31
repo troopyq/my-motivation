@@ -7,13 +7,23 @@ const auth: ReducerFunction<AuthParams> = (state) => {
 	state.formAuth.isLoading = LoadingState.LOADING;
 };
 
+const setTokenAuth: ReducerFunction<string> = (state, { payload: token }) => {
+	state.user.token = token;
+	state.user.isLoaded = LoadingState.LOADING;
+};
+
+const clearToken: ReducerFunction = (state) => {
+	state.user.token = null;
+	state.user.isLoaded = LoadingState.REJECT;
+};
+
 const authSuccess: ReducerFunction<User | undefined> = (state, { payload }) => {
 	state.formAuth.isLoading = LoadingState.RESOLVE;
-	state.user.isLoaded = true;
-	state.user.id = payload?.id;
-	state.user.role = payload?.role;
-	state.user.last_name = payload?.last_name;
-	state.user.first_name = payload?.first_name;
+	state.user.isLoaded = LoadingState.RESOLVE;
+
+	Object.keys(payload || {}).forEach((el) => {
+		state.user[el] = payload?.[el];
+	});
 };
 
 const authFailed: ReducerFunction<string> = (state, { payload }) => {
@@ -22,4 +32,6 @@ const authFailed: ReducerFunction<string> = (state, { payload }) => {
 	state.formAuth.error = payload;
 };
 
-export const reducers = { auth, authSuccess, authFailed };
+const getUser: ReducerFunction<number | undefined> = (state) => state;
+
+export const reducers = { auth, authSuccess, authFailed, setTokenAuth, clearToken, getUser };

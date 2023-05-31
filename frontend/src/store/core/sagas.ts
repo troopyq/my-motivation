@@ -4,9 +4,9 @@ import { coreActions } from './actions';
 import { AuthParams, AuthResponse, User } from './types';
 import { call } from '../../utils/saga';
 import api from '../../utils/api/idnex';
-import axios from 'axios';
+import { AxiosError } from 'axios';
 
-function* getUser(id?: number) {
+function* getUser({ payload: id }: { payload: number | undefined }) {
 	try {
 		const res = yield* call(() => api.get<Response<User>>('/user', { params: { id } }));
 		if (res && res.status === 200 && res.data.status) {
@@ -19,23 +19,28 @@ function* getUser(id?: number) {
 
 function* auth({ payload }: { payload: AuthParams }) {
 	try {
-		const a = yield* call(() => axios('https://jsonplaceholder.typicode.com/todos/1'));
-		console.log(a);
-
 		const res = yield* call(() => api.post<Response<AuthResponse>>('/auth', payload));
-		if (res && res.status === 200 && res.data.status) {
+
+		if (res?.status === 200 && res.data.status) {
 			localStorage.setItem('token', res.data.data?.token || '');
-			yield getUser(res.data.data?.id);
+			yield put(coreActions.setTokenAuth(res.data.data?.token || ''));
+			yield put(coreActions.getUser(res.data.data?.id));
+		} else if (res?.status === 401) {
+			yield put(coreActions.authFailed('Неправильный логин или пароль'));
 		} else {
 			throw new Error(res.data.error || 'Ошибка авторизации');
 		}
 	} catch (error) {
-		yield put(coreActions.authFailed((error as Error).message));
+		yield put(
+			coreActions.authFailed(
+				(error as AxiosError<Response>).response?.data?.error || 'Ошибка авторизации',
+			),
+		);
 	}
 }
 
 function* coreSaga(): GeneratorSagaType {
-	yield all([takeLatest(coreActions.auth, auth)]);
+	yield all([takeLatest(coreActions.auth, auth), takeLatest(coreActions.getUser, getUser)]);
 }
 
 export default coreSaga;

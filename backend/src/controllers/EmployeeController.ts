@@ -10,7 +10,7 @@ class EmployeeController {
 			`);
 			res.status(200).json({status: true, data: row?.[0]})
 		} catch (e: any) {
-			error(req, res, e);
+			error(req, res, 500, e);
 		}
 	}
 }

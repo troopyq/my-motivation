@@ -21,8 +21,9 @@ export type User = {
 	vacation_days?: Nnumber;
 	position_days?: Nnumber;
 	user_id?: number;
-	isLoaded: boolean;
+	isLoaded: '' | LoadingState;
 	token?: Nstring;
+	[K: string]: unknown;
 };
 
 export type CoreState = {

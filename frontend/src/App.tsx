@@ -2,49 +2,74 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthPage } from './components/pages';
 import { coreSelectors } from './store/core/selectors';
-import Dashboard from './components/pages/Dashboard/Dashboard';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import api from 'utils/api/idnex';
 import { coreActions } from 'store/core/actions';
+import { Box, CircularProgress } from '@mui/material';
+import { PageLayout } from 'components/layout';
+import { Profile, Dashboard } from 'components/pages';
 
 function App() {
 	const dispatch = useDispatch();
 	document.title = 'Моя мотивация';
 
-	const { isLoaded, token } = useSelector(coreSelectors.user);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+
+	const { token } = useSelector(coreSelectors.user);
 
 	useEffect(() => {
-		if (token) {
+		const localToken = localStorage.getItem('token');
+		if (localToken) {
 			api
 				.post('/check')
 				.then((res) => {
-					console.log('res', res);
+					dispatch(coreActions.setTokenAuth(localToken));
+					dispatch(coreActions.getUser(res.data?.data?.id));
 				})
 				.catch((e) => {
-					console.log('err', e);
 					localStorage.removeItem('token');
+					dispatch(coreActions.clearToken());
 					dispatch(coreActions.authFailed(''));
-				});
+				})
+				.finally(() => setIsLoading(false));
+		} else {
+			setIsLoading(false);
 		}
 	}, []);
+
+	if (isLoading)
+		return (
+			<Box
+				sx={{
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+					width: '100vw',
+					height: '100vh',
+				}}
+			>
+				<CircularProgress />
+			</Box>
+		);
 
 	return (
 		<BrowserRouter basename="/">
 			<Routes>
-				{isLoaded ? (
-					token ? (
-						<>
-							<Route index element={<Dashboard />} />
-							<Route path="*" element={<Navigate to="/" />} />
-						</>
-					) : (
-						<>
-							<Route path="/auth" element={<AuthPage />} />
-							<Route path="*" element={<Navigate to="/auth" />} />
-						</>
-					)
+				{token ? (
+					<>
+						<Route path="/" element={<PageLayout />}>
+							<Route path="dashboard" element={<Dashboard />} />
+							<Route path="profile/:id" element={<Profile />} />
+							<Route path="" element={<Navigate to="dashboard" />} />
+							<Route path="*" element={<Navigate to="dashboard" />} />
+						</Route>
+						<Route path="*" element={<Navigate to="dashboard" />} />
+					</>
 				) : (
-					'Loading...'
+					<>
+						<Route path="/auth" element={<AuthPage />} />
+						<Route path="*" element={<Navigate to="/auth" />} />
+					</>
 				)}
 			</Routes>
 		</BrowserRouter>

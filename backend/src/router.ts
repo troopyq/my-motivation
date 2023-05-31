@@ -13,4 +13,6 @@ router.post('/auth', AuthController.auth);
 router.post('/check', AuthController.checkAuth);
 router.get('/check', AuthController.checkAuth);
 
+router.get('/logout', AuthController.logout);
+
 export { router };

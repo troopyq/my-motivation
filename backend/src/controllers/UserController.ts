@@ -21,7 +21,7 @@ class UserController {
 
 			return res.status(200).json({ status: true, data: { ...employee } } as Res);
 		} catch (e) {
-			error(req, res, e);
+			error(req, res, 500, e);
 		}
 	}
 }
