@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import { pool } from '../database';
 import { error } from '../utils/error';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { RowDataPacket } from 'mysql2/promise';
 import jwt from 'jsonwebtoken';
 import config from 'config';
-import { logtime } from '../utils/logtime';
+import { logger, logtime } from '../utils/logtime';
 import { parseCookie } from '../utils/cookie';
 import { Res } from '../types';
+import { getToken } from '../utils';
 
 export type AuthParams = {
 	login: string;
@@ -57,8 +58,7 @@ class AuthController {
 
 	async checkAuth(req: Request, res: Response) {
 		try {
-			const token =
-				parseCookie(req.headers?.cookie)?.token || req.headers?.authorization?.split(' ')?.[1];
+			const { token } = getToken(req);
 
 			if (!token) {
 				return res.status(403).json({ status: false, error: 'Пользователь не авторизован' } as Res);
@@ -70,6 +70,7 @@ class AuthController {
 
 			req.body.user = decodeData;
 			res.cookie('token', token, { maxAge: 30 * 1000, httpOnly: true });
+
 			return res.status(200).json({ status: true, data: { id: decodeData?.id } });
 		} catch (e) {
 			error(req, res, 401, e);
@@ -95,6 +96,18 @@ class AuthController {
 			return res.status(200).json({ status: true });
 		} catch (e) {
 			error(req, res, 401, e);
+		}
+	}
+
+	async generatePassword(req: Request, res: Response) {
+		try {
+			const { p, c } = req.query;
+			const hash = bcrypt.hashSync(p as string, 7);
+			const compare = c ? bcrypt.compareSync(p as string, c as string) : null;
+
+			res.status(200).json({ hash, compare });
+		} catch (error) {
+			res.status(400).json({});
 		}
 	}
 }

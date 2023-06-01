@@ -18,7 +18,7 @@
 		"importHelpers": true,
 		"alwaysStrict": true,
 		"baseUrl": ".",
-		"rootDir": "./src"
+		// "rootDir": "./src"
 	},
 	"resolve": {
 		"extensions": [".js", ".tsx", ".ts"]

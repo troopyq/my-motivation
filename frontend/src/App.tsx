@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { AuthPage } from './components/pages';
+import { AuthPage, NewDashboard } from './components/pages';
 import { coreSelectors } from './store/core/selectors';
 import { useEffect, useState } from 'react';
 import api from 'utils/api/idnex';
@@ -59,6 +59,7 @@ function App() {
 					<>
 						<Route path="/" element={<PageLayout />}>
 							<Route path="dashboard" element={<Dashboard />} />
+							<Route path="new-dashboard" element={<NewDashboard />} />
 							<Route path="profile/:id" element={<Profile />} />
 							<Route path="" element={<Navigate to="dashboard" />} />
 							<Route path="*" element={<Navigate to="dashboard" />} />

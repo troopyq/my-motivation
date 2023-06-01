@@ -11,7 +11,7 @@ export default function Deposits() {
 				2 030 230 руб.
 			</Typography>
 			<Typography color="text.secondary" sx={{ flex: 1 }}>
-				на {ruMoment().format('LL')}
+				на {ruMoment().format('DD.MM.YYYY')}
 			</Typography>
 		</React.Fragment>
 	);

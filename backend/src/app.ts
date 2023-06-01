@@ -17,6 +17,11 @@ app.use(express.json());
 
 app.use('/api', router);
 
-app.listen(PORT, () => console.log('SERVER STARTED ON PORT ' + PORT));
+try {
+  app.listen(PORT, () => console.log('SERVER STARTED ON PORT ' + PORT));
+} catch (error) {
+  console.log('SERVER ERROR ON PORT:', PORT);
+  
+}
 
 export { app, PORT };

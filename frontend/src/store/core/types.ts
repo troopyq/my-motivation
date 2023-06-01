@@ -20,7 +20,11 @@ export type User = {
 	bonuses?: Nstring;
 	vacation_days?: Nnumber;
 	position_days?: Nnumber;
-	user_id?: number;
+	avatar_img?: Nstring;
+	role_desc?: Nstring;
+	role_name?: Nstring;
+	block?: Nstring;
+
 	isLoaded: '' | LoadingState;
 	token?: Nstring;
 	[K: string]: unknown;

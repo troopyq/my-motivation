@@ -3,3 +3,10 @@ export type Res<T extends unknown = unknown> = {
 	status: boolean;
 	data?: T;
 };
+
+export type JWTData = {
+	id: number;
+	roles: string;
+	iat: number;
+	exp: number;
+};

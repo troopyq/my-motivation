@@ -1,4 +1,6 @@
-export type Employee = {
+import { RowDataPacket } from 'mysql2/promise';
+
+export interface Employee {
 	id: number;
 	first_name: string;
 	last_name: string;
@@ -11,5 +13,18 @@ export type Employee = {
 	bonuses: Nstring;
 	vacation_days: number;
 	position_days: number;
-	user_id: number;
-};
+	block: Nstring;
+}
+
+export interface IEmployee extends Employee, RowDataPacket {}
+
+export interface IRole extends RowDataPacket {
+	id: number;
+	role_name: string;
+	role_desc: Nstring;
+}
+
+export interface IShortEmployee extends RowDataPacket {
+	id: number;
+	fio: string;
+}

@@ -4,6 +4,7 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { Provider } from 'react-redux';
 import store from './store/index.ts';
 import { ThemeOptions } from '@mui/material/styles';
+import { baselightTheme } from 'theme/DefaultColors.ts';
 
 export const themeOptions: ThemeOptions = {
   palette: {
@@ -17,9 +18,24 @@ export const themeOptions: ThemeOptions = {
       main: '#f50057',
     },
   },
+  typography: {
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+  },
 };
 
-const theme = createTheme(themeOptions);
+// const theme = createTheme(themeOptions);
+const theme = baselightTheme;
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<ThemeProvider theme={theme}>
