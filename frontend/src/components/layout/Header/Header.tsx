@@ -7,22 +7,20 @@ import {
 	Typography,
 	Tooltip,
 	Box,
-	ThemeOptions,
-	CustomTheme,
-	InputBase,
-	alpha,
-	TextField,
+	Avatar,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExitToApp from '@mui/icons-material/ExitToApp';
 import SearchIcon from '@mui/icons-material/Search';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import api from 'utils/api/idnex';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useDispatch, useSelector } from 'react-redux';
 import { coreActions } from 'store/core/actions';
 import { useNavigate } from 'react-router-dom';
 import { coreSelectors } from 'store/core/selectors';
+import { Response } from 'store/types';
+import { Search, StyledInputBase } from './styles';
 
 const drawerWidth: number = 240;
 
@@ -30,64 +28,7 @@ interface AppBarProps extends MuiAppBarProps {
 	open?: boolean;
 }
 
-const Search = styled('div')(({ theme }) => ({
-	position: 'relative',
-	borderRadius: theme.shape.borderRadius,
-	backgroundColor: alpha(theme.palette.common.white, 0.15),
-	'&:hover': {
-		backgroundColor: alpha(theme.palette.common.white, 0.25),
-	},
-	marginLeft: 0,
-	width: '100%',
-	[theme.breakpoints.up('sm')]: {
-		marginLeft: theme.spacing(1),
-		width: 'auto',
-	},
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-	padding: theme.spacing(0, 2),
-	height: '100%',
-	position: 'absolute',
-	pointerEvents: 'none',
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-	color: 'inherit',
-	'& .MuiInputBase-input': {
-		padding: theme.spacing(1, 1, 1, 0),
-		// vertical padding + font size from searchIcon
-		paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-		transition: theme.transitions.create('width'),
-		width: '100%',
-		[theme.breakpoints.up('sm')]: {
-			width: '170px',
-			'&:focus': {
-				width: '300px',
-			},
-		},
-	},
-}));
-
-const StyledTextField = styled(Autocomplete)(({ theme }) => ({
-	color: 'inherit',
-	'& .MuiTextField-root': {
-		padding: theme.spacing(1, 1, 1, 0),
-		// vertical padding + font size from searchIcon
-		paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-		transition: theme.transitions.create('width'),
-		width: '100%',
-		[theme.breakpoints.up('sm')]: {
-			width: '170px',
-			'&:focus': {
-				width: '300px',
-			},
-		},
-	},
-}));
+type SearchList = { id: string; fio: string; avatar_img: Nstring };
 
 const AppBar = styled(MuiAppBar, {
 	shouldForwardProp: (prop) => prop !== 'open',
@@ -111,6 +52,7 @@ export const Header: React.FC<{ open: boolean; onToggle: VoidFunction }> = ({ op
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const user = useSelector(coreSelectors.user);
+	const [searchList, setSearchList] = useState<SearchList[]>([]);
 
 	const headerTitle = useSelector(coreSelectors.titleHeader);
 
@@ -122,18 +64,26 @@ export const Header: React.FC<{ open: boolean; onToggle: VoidFunction }> = ({ op
 			navigate('/');
 		});
 	};
-	const top100Films = [
-		{ title: 'The Shawshank Redemption', year: 1994 },
-		{ title: 'The Godfather', year: 1972 },
-		{ title: 'The Godfather: Part II', year: 1974 },
-		{ title: 'The Dark Knight', year: 2008 },
-		{ title: '12 Angry Men', year: 1957 },
-		{ title: "Schindler's List", year: 1993 },
-		{ title: 'Pulp Fiction', year: 1994 },
-	];
 
-	const toProfile = () => {
-		navigate('/profile/' + user.id);
+	useEffect(() => {
+		api.get<Response<SearchList[]>>('/searchUsers').then((res) => {
+			if (res?.data?.status) {
+				setSearchList(res.data?.data || []);
+			}
+		});
+	}, []);
+
+	const toProfile = (id?: Nstring | number) => {
+		navigate(`/profile/${id || user.id || ''}`);
+	};
+
+	const [isOpen, setIsOpen] = useState(false);
+
+	const onSelect = (option: SearchList, call: any) => {
+		toProfile(option.id as string);
+		setIsOpen(false);
+
+		if (call) call();
 	};
 
 	return (
@@ -158,46 +108,70 @@ export const Header: React.FC<{ open: boolean; onToggle: VoidFunction }> = ({ op
 				<Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
 					{headerTitle}
 				</Typography>
-				<Search sx={{ mr: 5 }}>
-					{/* <SearchIconWrapper>
-						<SearchIcon />
-					</SearchIconWrapper> */}
-					{/* <StyledInputBase
-						placeholder="Поиск сотрудников"
-						inputProps={{ 'aria-label': 'search' }}
-					/> */}
-					<Autocomplete
-						sx={{ width: 300 }}
-						freeSolo
-						id="free-solo-2-demo"
-						disableClearable
-						options={top100Films.map((option) => option.title)}
-						renderInput={(params) => (
-							<TextField
+
+				<Autocomplete
+					freeSolo
+					id="free-solo-2-demo"
+					disableClearable
+					size="small"
+					options={searchList}
+					open={isOpen}
+					getOptionLabel={(e: SearchList) => e?.fio}
+					onOpen={() => setIsOpen(true)}
+					disableCloseOnSelect={false}
+					onClose={(e, reason) => {
+						// if (reason === 'selectOption') return;
+						setIsOpen(false);
+					}}
+					renderOption={(prop, option) => {
+						const { onClick, ...props } = prop;
+						return (
+							//@ts-ignore
+							<Box sx={{ display: 'flex' }} gap={2} {...props} onClick={() => onSelect(option)}>
+								{option?.avatar_img ? (
+									<Avatar sx={{ height: 40, width: 40 }} src={option?.avatar_img} />
+								) : null}
+								{option.fio}
+							</Box>
+						);
+					}}
+					autoSelect={false}
+					autoComplete={false}
+					renderInput={(params) => (
+						<Search sx={{ mr: 5, display: 'flex', alignItems: 'center', width: 400 }}>
+							<StyledInputBase
 								{...params}
-								label="Поиск сотрудников"
+								placeholder="Поиск сотрудников"
+								variant="standard"
 								InputProps={{
 									...params.InputProps,
-									type: 'search',
+									disableUnderline: true,
 								}}
 							/>
-						)}
-					/>
-				</Search>
 
+							<IconButton type="button" sx={{ p: '10px' }} aria-label="search">
+								<SearchIcon sx={{ fill: '#eee' }} />
+							</IconButton>
+						</Search>
+					)}
+				/>
 				<Tooltip title={`${user.last_name} ${user.first_name} ${user.middle_name || ''}`}>
-					<IconButton onClick={toProfile} color="inherit">
-						<Box
-							display="flex"
-							alignItems="center"
-							justifyContent="center"
-							bgcolor="primary.dark"
-							sx={{ width: 45, height: 45, borderRadius: 50 }}
-						>
-							<Typography variant="body1" fontWeight={700}>
-								{user.last_name ? `${user.last_name?.[0]}${user.first_name?.[0]}` : null}
-							</Typography>
-						</Box>
+					<IconButton onClick={() => toProfile(user?.id?.toString())} color="inherit">
+						{user?.avatar_img ? (
+							<Avatar sx={{ width: 45, height: 45 }} src={user?.avatar_img || ''} />
+						) : (
+							<Box
+								display="flex"
+								alignItems="center"
+								justifyContent="center"
+								bgcolor="primary.dark"
+								sx={{ width: 45, height: 45, borderRadius: 50 }}
+							>
+								<Typography variant="body1" fontWeight={700}>
+									{user.last_name ? `${user.last_name?.[0]}${user.first_name?.[0]}` : null}
+								</Typography>
+							</Box>
+						)}
 					</IconButton>
 				</Tooltip>
 				<Tooltip title="Выход">

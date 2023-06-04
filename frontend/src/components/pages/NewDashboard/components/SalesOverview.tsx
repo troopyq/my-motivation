@@ -1,15 +1,15 @@
 import React from 'react';
-import { Select, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import DashboardCard from 'components/shared/DashboardCard';
 import Chart from 'react-apexcharts';
+import { ApexOptions } from 'apexcharts';
 
 const SalesOverview = () => {
 	// select
 	const [month, setMonth] = React.useState('1');
 
-	const handleChange = (event) => {
-		setMonth(event.target.value);
+	const handleChange = (event: any) => {
+		setMonth(event?.target?.value);
 	};
 
 	// chart color
@@ -18,10 +18,10 @@ const SalesOverview = () => {
 	const secondary = theme.palette.secondary.main;
 
 	// chart
-	const optionscolumnchart = {
+	const optionscolumnchart: ApexOptions = {
 		chart: {
 			type: 'bar',
-			fontFamily: "'Plus Jakarta Sans', sans-serif;",
+
 			foreColor: '#adb0bb',
 			toolbar: {
 				show: true,
@@ -34,7 +34,7 @@ const SalesOverview = () => {
 				horizontal: false,
 				barHeight: '60%',
 				columnWidth: '42%',
-				borderRadius: [6],
+				borderRadius: 6,
 				borderRadiusApplication: 'end',
 				borderRadiusWhenStacked: 'all',
 			},

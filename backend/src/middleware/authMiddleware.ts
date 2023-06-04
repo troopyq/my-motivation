@@ -11,7 +11,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 	try {
 		const token =
 			parseCookie(req.headers?.cookie)?.token || req.headers?.authorization?.split(' ')?.[1];
-		logtime(req, token);
 
 		if (!token) {
 			return res.status(403).json({ status: false, error: 'Пользователь не авторизован' } as Res);

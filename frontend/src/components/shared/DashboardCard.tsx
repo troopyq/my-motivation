@@ -13,7 +13,17 @@ const DashboardCard = ({
 	headtitle,
 	headsubtitle,
 	middlecontent,
-}) => {
+}: Partial<{
+	title: any;
+	subtitle: any;
+	children: any;
+	action: any;
+	footer: any;
+	cardheading: any;
+	headtitle: any;
+	headsubtitle: any;
+	middlecontent: any;
+}>) => {
 	return (
 		<Card sx={{ padding: 0, overflow: 'visible' }} elevation={9} variant={undefined}>
 			{cardheading ? (

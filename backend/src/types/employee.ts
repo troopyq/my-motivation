@@ -14,6 +14,7 @@ export interface Employee {
 	vacation_days: number;
 	position_days: number;
 	block: Nstring;
+	avatar_img: Nstring;
 }
 
 export interface IEmployee extends Employee, RowDataPacket {}
@@ -24,7 +25,10 @@ export interface IRole extends RowDataPacket {
 	role_desc: Nstring;
 }
 
-export interface IShortEmployee extends RowDataPacket {
+export interface ShortEmployee {
 	id: number;
 	fio: string;
+	avatar_img: Nstring;
 }
+
+export interface IShortEmployee extends ShortEmployee, RowDataPacket {}

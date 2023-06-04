@@ -1,13 +1,9 @@
-import React from 'react';
 import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/material/styles';
-import { Stack, Typography, Avatar, Fab, Grid } from '@mui/material';
+import { Stack, Typography, Avatar, Grid } from '@mui/material';
 import SouthEastIcon from '@mui/icons-material/SouthEast';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import DashboardCard from 'components/shared/DashboardCard';
 import { ApexOptions } from 'apexcharts';
-import moment from 'moment';
-import { ruMoment } from 'utils';
 
 const MonthlyEarnings = () => {
 	// chart color
@@ -22,7 +18,6 @@ const MonthlyEarnings = () => {
 			type: 'area',
 			width: '90%',
 
-			fontFamily: "'Plus Jakarta Sans', sans-serif;",
 			foreColor: '#adb0bb',
 			toolbar: {
 				show: false,
@@ -88,7 +83,7 @@ const MonthlyEarnings = () => {
 						options={optionscolumnchart}
 						series={seriescolumnchart}
 						type="area"
-						height="180px"
+						height="110px"
 					/>
 				</Grid>
 			}
@@ -99,7 +94,10 @@ const MonthlyEarnings = () => {
 				</Typography>
 				<Stack direction="row" spacing={1} my={1} alignItems="center">
 					<Avatar sx={{ bgcolor: errorlight, width: 27, height: 27, transform: 'rotate(-90deg)' }}>
-						<SouthEastIcon width={20} color="#FA896B" />
+						{
+							//@ts-ignore
+							<SouthEastIcon width={20} color="#FA896B" />
+						}
 					</Avatar>
 					<Typography variant="subtitle2" fontWeight="600">
 						+9%

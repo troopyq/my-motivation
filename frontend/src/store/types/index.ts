@@ -10,7 +10,7 @@ export type GeneratorSagaType<T = void | never> = Generator<
 	unknown
 >;
 
-export type Response<T extends Record<string, unknown> = Record<string, unknown>> = {
+export type Response<T extends Record<string, any> | Record<string, any>[] = Record<string, any>> = {
 	error?: Nstring;
 	status: boolean;
 	data?: T;

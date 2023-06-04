@@ -1,9 +1,11 @@
-import moment from 'moment';
+//@ts-ignore
+import mom from 'moment/min/moment-with-locales';
 import 'moment/locale/ru';
+import moment from 'moment';
 
-console.log(moment.locale('ru'));
+moment.locale('ru');
 
-export const ruMoment = moment;
+export const ruMoment = mom as typeof moment;
 
 export const moneyFormat = (
 	n: number | string | null | undefined,
@@ -16,7 +18,7 @@ export const moneyFormat = (
 
 	return number
 		.toFixed(Math.max(fixed, 0))
-		.replace(/(?<!\.\d*)(\d)(?=(\d{3})+(?!\d))/g, '$1')
+		.replace(/(?<!\.\d*)(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
 		.replace('.', delimeter);
 };
 

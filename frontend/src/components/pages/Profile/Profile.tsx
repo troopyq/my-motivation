@@ -6,13 +6,17 @@ import { Response } from 'store/types';
 import { Loading } from 'ui';
 import api from 'utils/api/idnex';
 import { AxiosError } from 'axios';
-import { User } from 'store/core/types';
+import { RatingData, User } from 'store/core/types';
 import { moneyFormat, ruMoment, sklonenie } from 'utils';
+import { CrownIcon } from 'assets/icons/Crown';
+import { topColors } from '../Rating';
 
 type ProfileState = {
 	loading: boolean;
 	data?: User;
+	ratingData?: RatingData[];
 	error?: Nstring;
+	errorRating?: Nstring;
 };
 
 export const Profile: React.FC = () => {
@@ -21,17 +25,19 @@ export const Profile: React.FC = () => {
 	});
 
 	const user = state?.data;
+	const rating = state?.ratingData?.[0];
 
 	const params = useParams();
 
-	console.log(params);
-
 	useEffect(() => {
+		console.log(params);
+
 		setState((prev) => ({
 			...prev,
 			loading: true,
 		}));
 
+		// User
 		api
 			.get<Response<User>>(`/profile`, { params })
 			.then(({ data, status }) => {
@@ -45,16 +51,34 @@ export const Profile: React.FC = () => {
 				}
 			})
 			.catch((res: AxiosError<Response>) => {
-				console.log(res);
-
 				setState((prev) => ({
 					...prev,
 					loading: false,
-					error:
+					errorRating:
 						res.response?.data?.error || 'Не удалось загрузить профиль. Повторите попытку позже',
 				}));
 			});
-	}, [params]);
+
+		// Rating
+		api
+			.get<Response<RatingData[]>>('/rating', { params: { employee_id: params?.id || undefined } })
+			.then((res) => {
+				if (res.data.status) {
+					setState((prev) => ({
+						...prev,
+						ratingData: res.data.data || [],
+						errorRating: null,
+					}));
+				}
+			})
+			.catch((err: AxiosError<Response>) => {
+				console.log('err rating - ', err);
+				setState((prev) => ({
+					...prev,
+					errorRating: err.response?.data?.error || 'Не удалось загрузить рейтинг. Повторите позже',
+				}));
+			});
+	}, [params.id]);
 
 	if (state.loading) return <Loading />;
 
@@ -87,10 +111,17 @@ export const Profile: React.FC = () => {
 
 	return (
 		<Grid container spacing={3}>
-			<Grid item xs={12} md={8} lg={9}>
-				<Card sx={{ padding: 0, overflow: 'visible' }} elevation={9} variant={undefined}>
+			<Grid item xs={12} md={8} lg={8}>
+				<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
 					<CardContent sx={{ p: '30px' }}>
-						<Box display="flex" gap={5}>
+						<Box display="flex" gap={5} position="relative">
+							{Number(rating?.position) <= 3 ? (
+								<CrownIcon
+									sx={{ position: 'absolute', top: -30, left: -20, zIndex: 2 }}
+									size={50}
+									fill={topColors?.[(rating?.position || 0) - 1]}
+								/>
+							) : null}
 							<Avatar
 								sx={{ width: 150, height: 150 }}
 								src={(user?.avatar_img as string) || ''}
@@ -119,8 +150,8 @@ export const Profile: React.FC = () => {
 			</Grid>
 
 			{user?.salary ? (
-				<Grid item xs={12} md={4} lg={3}>
-					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={9} variant={undefined}>
+				<Grid item xs={12} md={4} lg={4}>
+					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
 						<CardContent sx={{ p: '30px' }}>
 							<Box display="flex" gap={5}>
 								<Box display="flex" flexDirection="column" gap={5.5}>
@@ -156,8 +187,8 @@ export const Profile: React.FC = () => {
 				</Grid>
 			) : null}
 			{user?.vacation_days ? (
-				<Grid item xs={7} md={3} lg={2}>
-					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={9} variant={undefined}>
+				<Grid item xs={7} md={3} lg={3}>
+					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
 						<CardContent sx={{ p: '30px' }}>
 							<Box display="flex" gap={5}>
 								<Box display="flex" flexDirection="column" gap={3}>
@@ -178,7 +209,7 @@ export const Profile: React.FC = () => {
 				</Grid>
 			) : null}
 			<Grid item xs={7} md={4} lg={3}>
-				<Card sx={{ padding: 0, overflow: 'visible' }} elevation={9} variant={undefined}>
+				<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
 					<CardContent sx={{ p: '30px' }}>
 						<Box display="flex" gap={5}>
 							<Box display="flex" flexDirection="column" gap={3}>
@@ -187,7 +218,10 @@ export const Profile: React.FC = () => {
 										<Typography color="primary" variant="h4">
 											{user?.position_days}
 										</Typography>
-										<Typography variant="h5">	{sklonenie(+(user?.position_days || 0), ['день', 'дня', 'дней'])} в компании</Typography>
+										<Typography variant="h5">
+											{' '}
+											{sklonenie(+(user?.position_days || 0), ['день', 'дня', 'дней'])} в компании
+										</Typography>
 									</Box>
 								</Box>
 							</Box>

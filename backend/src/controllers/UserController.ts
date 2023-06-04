@@ -43,10 +43,6 @@ const UserController = {
 
 			logtime(req, req.query);
 
-			// 	const [[employee]] = await pool.query<IEmployee[]>(`
-			// 	SELECT * from employee WHERE user_id='${id}'
-			//  `);
-
 			const employee = await getUserInfoFromDB(id as string);
 
 			if (!employee)
@@ -85,13 +81,9 @@ const UserController = {
 
 	async searchEmployees(req: Request, res: Response) {
 		try {
-			const { search } = req.query;
-
 			const [employees] = await pool.query<IShortEmployee[]>(`
-		SELECT * from searchEmployees WHERE fio LIKE '%${search || ''}%'
-	 `);
-
-			logtime(req, employees);
+		SELECT * from searchEmployees
+		`);
 
 			res.status(200).json({ status: true, data: employees } as Res);
 		} catch (e) {
