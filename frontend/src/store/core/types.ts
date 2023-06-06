@@ -14,7 +14,6 @@ export type User = {
 	middle_name?: string;
 	birthday?: string;
 	position_id?: Nnumber;
-	role?: string;
 	salary?: string;
 	target_completion?: Nstring;
 	bonuses?: Nstring;
@@ -24,6 +23,7 @@ export type User = {
 	role_desc?: Nstring;
 	role_name?: Nstring;
 	block?: Nstring;
+	salary_data?: { date: Nstring; salary: Nnumber; bonuse: Nnumber }[] | null;
 
 	isLoaded: '' | LoadingState;
 	token?: Nstring;

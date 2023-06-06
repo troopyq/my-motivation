@@ -76,7 +76,7 @@ const MonthlyEarnings = () => {
 
 	return (
 		<DashboardCard
-			title="Динамика продаж за последний месяц"
+			title="Динамика продаж за текущий месяц"
 			footer={
 				<Grid sx={{ margin: '0 auto', width: '100%' }}>
 					<Chart

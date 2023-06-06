@@ -5,12 +5,20 @@ import Container from '@mui/material/Container';
 
 import { Header, SideBar } from 'components/layout';
 import { Outlet } from 'react-router-dom';
+import api from 'utils/api/idnex';
 
 export const PageLayout: React.FC = () => {
 	const [open, setOpen] = React.useState(false);
 	const onToggle = () => {
 		setOpen(!open);
 	};
+
+	React.useEffect(() => {
+		// api.interceptors.response.use(
+		// 	(res) => console.log('res', res),
+		// 	(err) => console.log(err),
+		// );
+	}, []);
 
 	return (
 		<Box sx={{ display: 'flex' }}>

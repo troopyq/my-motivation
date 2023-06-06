@@ -5,11 +5,22 @@ import { RowDataPacket } from 'mysql2/promise';
 import { logger, logtime } from '../utils/logtime';
 import { Res } from '../types';
 import { Employee, IEmployee, IRole, IShortEmployee } from '../types/employee';
-import { getToken } from '../utils';
+import { getToken, upd } from '../utils';
+
+interface Salary {
+	id: number;
+	employee_id: number;
+	salary_data: Record<string, any>[] | string | null;
+}
+interface ISalary extends Salary, RowDataPacket {}
+
+interface ISalaryUpdate extends Request {
+	body: Salary;
+}
 
 const getUserInfoFromDB = async (
 	id?: number | string,
-): Promise<Partial<IRole & IEmployee> | null> => {
+): Promise<Partial<IRole & IEmployee & ISalary> | null> => {
 	try {
 		if (!id) return null;
 
@@ -23,11 +34,16 @@ const getUserInfoFromDB = async (
 		SELECT * from roles WHERE id='${employee.position_id}'
 	 `);
 
+		const [[salaryes]] = await pool.query<ISalary[]>(`
+		SELECT * from salaryes WHERE employee_id='${employee.position_id}'
+	 `);
+
 		const { id: _id, ...roles } = role;
 
 		return {
 			...employee,
 			...roles,
+			salary_data: JSON.parse(salaryes?.salary_data as string),
 		};
 	} catch (error) {
 		logger(error);
@@ -70,10 +86,28 @@ const UserController = {
 				return res.status(200).json({ status: true, data: { ...employee } } as Res);
 			}
 
-			const { bonuses, salary, target_completion, vacation_days, ...profile } =
-				employee as Employee;
+			const { bonuses, salary, target_completion, vacation_days, salary_data, ...profile } =
+				employee;
 
 			return res.status(200).json({ status: true, data: { ...profile } } as Res);
+		} catch (e) {
+			error(req, res, 500, e);
+		}
+	},
+
+	async updateSalary(req: ISalaryUpdate, res: Response) {
+		try {
+			const { employee_id, salary_data } = req.body;
+
+			logger(`${upd({ salary_data })}`);
+
+			const resp = await pool.query(`
+        UPDATE salaryes SET
+				salary_data = ${upd({ salary_data }, true)}
+        WHERE employee_id=${employee_id}
+       `);
+
+			res.status(200).json({ status: true } as Res);
 		} catch (e) {
 			error(req, res, 500, e);
 		}

@@ -3,7 +3,7 @@ import mom from 'moment/min/moment-with-locales';
 import 'moment/locale/ru';
 import moment from 'moment';
 
-moment.locale('ru');
+console.log(mom.locale('ru'));
 
 export const ruMoment = mom as typeof moment;
 

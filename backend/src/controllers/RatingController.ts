@@ -7,35 +7,6 @@ import { Res } from '../types';
 import { IEmployee, IRole, ShortEmployee } from '../types/employee';
 import { upd } from '../utils';
 
-const getUserInfoFromDB = async (
-	id?: number | string,
-): Promise<Partial<IRole & IEmployee> | null> => {
-	try {
-		if (!id) return null;
-
-		const [[employee]] = await pool.query<IEmployee[]>(`
-		SELECT * from employee WHERE id='${id}'
-	 `);
-
-		if (!employee) return null;
-
-		const [[role]] = await pool.query<IRole[]>(`
-		SELECT * from roles WHERE id='${employee.position_id}'
-	 `);
-
-		const { id: _id, ...roles } = role;
-
-		return {
-			...employee,
-			...roles,
-		};
-	} catch (error) {
-		logger(error);
-
-		return null;
-	}
-};
-
 interface Rating {
 	id: number;
 	balls: Nnumber;
@@ -67,9 +38,9 @@ const RatingController = {
         UPDATE rating SET
          execution_plan = ${upd({ execution_plan })},
          stars = ${upd({ stars })},
-         last_sales = ${upd({ last_sales })},
-         month_sales = ${upd({ month_sales })},
-         year_sales = ${upd({ year_sales })},
+         last_sales = ${upd({ last_sales }, true)},
+         month_sales = ${upd({ month_sales }, true)},
+         year_sales = ${upd({ year_sales }, true)}
         WHERE employee_id=${employee_id}
        `);
 

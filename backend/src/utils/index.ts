@@ -24,6 +24,8 @@ export const getToken = <T extends Record<string, unknown> = Partial<JWTData & {
 export const upd = (val?: Record<string, any>, isJson = false): string => {
 	if (isNil(val)) return '';
 	const name = Object.keys(val || {})?.[0];
+	console.log(name);
+
 	return `${
 		!isNil(val?.[name]) ? `'${isJson ? JSON.stringify(val[name] || []) : val[name]}'` : name
 	}`;

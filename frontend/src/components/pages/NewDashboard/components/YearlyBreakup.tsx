@@ -1,8 +1,6 @@
-import React from 'react';
 import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/material/styles';
 import { Grid, Stack, Typography, Avatar } from '@mui/material';
-import NorthWestIcon from '@mui/icons-material/NorthWest';
 import DashboardCard from 'components/shared/DashboardCard';
 import SouthEastIcon from '@mui/icons-material/SouthEast';
 import { ApexOptions } from 'apexcharts';
@@ -63,7 +61,7 @@ const YearlyBreakup = () => {
 	const seriescolumnchart = [378560, 425300];
 
 	return (
-		<DashboardCard title="Продаж за последний год">
+		<DashboardCard title="Продажи за текущий год">
 			<Grid container spacing={3}>
 				{/* column */}
 				<Grid item xs={6} sm={6}>

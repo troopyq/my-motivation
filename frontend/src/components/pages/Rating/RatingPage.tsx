@@ -1,7 +1,18 @@
-import { Box, Avatar, Typography, Grid, Card, CardContent, Rating } from '@mui/material';
-import { AxiosError } from 'axios';
+import {
+	Box,
+	Avatar,
+	Typography,
+	Grid,
+	Card,
+	CardContent,
+	Rating,
+	RatingProps,
+} from '@mui/material';
+import { AxiosError, AxiosResponse } from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { coreSelectors } from 'store/core/selectors';
 import { RatingData } from 'store/core/types';
 import { Response } from 'store/types';
 import { makeStyles } from 'tss-react/mui';
@@ -32,10 +43,12 @@ const useStyles = makeStyles()((theme) => ({
 
 export const RatingPage: React.FC = () => {
 	const { classes } = useStyles();
+	const navigate = useNavigate();
+	const { role_name } = useSelector(coreSelectors.user);
 	const [data, setData] = useState<RatingData[]>([]);
 	const [error, setError] = useState<Nstring>(null);
 	const [loading, setLoading] = useState<boolean>(true);
-	const navigate = useNavigate();
+	const isRKM = role_name === 'RKM';
 
 	useEffect(() => {
 		api
@@ -51,6 +64,34 @@ export const RatingPage: React.FC = () => {
 			.finally(() => setLoading(false));
 	}, []);
 
+	const stopProp: RatingProps['onClick'] = (event) => {
+		event.stopPropagation();
+	};
+
+	const onRating = (value: Nnumber, employee_id: number) => {
+		api
+			.post<Response, AxiosResponse<Response>, Pick<RatingData, 'employee_id' | 'stars'>>(
+				'/updateRating',
+				{
+					employee_id,
+					stars: value,
+				},
+			)
+			.then((res) => {
+				if (res.data?.status) {
+					setData((prev) =>
+						prev.map((el) => {
+							if (el.employee_id === employee_id) {
+								return { ...el, stars: value };
+							}
+
+							return el;
+						}),
+					);
+				}
+			});
+	};
+
 	if (error) return <ErrorCard err={error} />;
 
 	if (loading) return <Loading />;
@@ -59,7 +100,7 @@ export const RatingPage: React.FC = () => {
 		<Grid container spacing={3}>
 			{data.map((user) => {
 				return (
-					<Grid item xs={12} sm={6} md={4} lg={4}>
+					<Grid key={user?.employee_id} item xs={12} sm={6} md={4} lg={4}>
 						<Card
 							onClick={() => navigate(`/profile/${user.employee_id}`)}
 							className={classes.card}
@@ -85,8 +126,9 @@ export const RatingPage: React.FC = () => {
 												top: -15,
 												left: -5,
 												color: topColors?.[(user?.position || 0) - 1] || undefined,
-												fontSize: 21 + (8 - ((user?.position || 4) <= 3 ? (user?.position || 6) * 2 : 8)),
-												fontWeight: `${(user?.position || 0) <=3 ? 900 : 600} !important`,
+												fontSize:
+													21 + (8 - ((user?.position || 4) <= 3 ? (user?.position || 6) * 2 : 8)),
+												fontWeight: `${(user?.position || 0) <= 3 ? 900 : 600} !important`,
 											}}
 										>
 											{user?.position}
@@ -119,10 +161,12 @@ export const RatingPage: React.FC = () => {
 												</Typography>{' '}
 											</Typography>
 											<Rating
-												name="read-only"
+												name="rating"
+												onClick={stopProp}
+												onChange={(e, value) => onRating(value, user.employee_id)}
 												value={parseFloat(user?.stars?.toString() || '0')}
 												precision={0.5}
-												readOnly
+												readOnly={!isRKM}
 											/>
 										</Box>
 									</Box>

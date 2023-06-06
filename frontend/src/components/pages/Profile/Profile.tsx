@@ -1,5 +1,22 @@
-import { Avatar, Box, Card, CardContent, Grid, Paper, Typography } from '@mui/material';
+import {
+	Avatar,
+	Box,
+	Card,
+	CardContent,
+	Chip,
+	Grid,
+	IconButton,
+	Paper,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableRow,
+	Typography,
+} from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Response } from 'store/types';
@@ -30,8 +47,6 @@ export const Profile: React.FC = () => {
 	const params = useParams();
 
 	useEffect(() => {
-		console.log(params);
-
 		setState((prev) => ({
 			...prev,
 			loading: true,
@@ -112,7 +127,11 @@ export const Profile: React.FC = () => {
 	return (
 		<Grid container spacing={3}>
 			<Grid item xs={12} md={8} lg={8}>
-				<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
+				<Card
+					sx={{ padding: 0, overflow: 'visible', minHeight: 220 }}
+					elevation={8}
+					variant={undefined}
+				>
 					<CardContent sx={{ p: '30px' }}>
 						<Box display="flex" gap={5} position="relative">
 							{Number(rating?.position) <= 3 ? (
@@ -143,6 +162,15 @@ export const Profile: React.FC = () => {
 								<Typography variant="subtitle1" color="GrayText">
 									{user?.block}
 								</Typography>
+								<Box display="flex" alignItems="center" gap={0.5}>
+									<IconButton color="secondary">
+										<ThumbUpOffAltIcon />
+										{/* <ThumbUpAltIcon /> */}
+									</IconButton>
+									<Typography variant="body1" fontWeight={700}>
+										{2}
+									</Typography>
+								</Box>
 							</Box>
 						</Box>
 					</CardContent>
@@ -151,7 +179,11 @@ export const Profile: React.FC = () => {
 
 			{user?.salary ? (
 				<Grid item xs={12} md={4} lg={4}>
-					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
+					<Card
+						sx={{ padding: 0, overflow: 'visible', minHeight: 220 }}
+						elevation={8}
+						variant={undefined}
+					>
 						<CardContent sx={{ p: '30px' }}>
 							<Box display="flex" gap={5}>
 								<Box display="flex" flexDirection="column" gap={5.5}>
@@ -161,9 +193,9 @@ export const Profile: React.FC = () => {
 											<Typography color="primary" variant="h5">
 												{moneyFormat(+(user?.salary || 0) + +(user?.bonuses || 0))} руб.
 											</Typography>
-											<Typography fontWeight={600} color="success.main" variant="body2">
+											{/* <Typography fontWeight={600} color="success.main" variant="body2">
 												+12%
-											</Typography>
+											</Typography> */}
 										</Box>
 									</Box>
 									<Box display="flex" flexDirection="column" gap={0.5}>
@@ -189,8 +221,8 @@ export const Profile: React.FC = () => {
 			{user?.vacation_days ? (
 				<Grid item xs={7} md={3} lg={3}>
 					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
-						<CardContent sx={{ p: '30px' }}>
-							<Box display="flex" gap={5}>
+						<CardContent sx={{ display: 'flex', p: '30px', minHeight: 120 }}>
+							<Box display="flex" gap={5} flexGrow={1} alignItems="center">
 								<Box display="flex" flexDirection="column" gap={3}>
 									<Box display="flex" flexDirection="column" gap={1}>
 										<Typography variant="h4">Отпуск</Typography>
@@ -208,10 +240,11 @@ export const Profile: React.FC = () => {
 					</Card>
 				</Grid>
 			) : null}
+
 			<Grid item xs={7} md={4} lg={3}>
 				<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
-					<CardContent sx={{ p: '30px' }}>
-						<Box display="flex" gap={5}>
+					<CardContent sx={{ display: 'flex', p: '30px', minHeight: 120 }}>
+						<Box display="flex" gap={5} flexGrow={1} alignItems="center">
 							<Box display="flex" flexDirection="column" gap={3}>
 								<Box display="flex" flexDirection="column" gap={1}>
 									<Box display="flex" gap={1.2} alignItems="center">
@@ -229,6 +262,112 @@ export const Profile: React.FC = () => {
 					</CardContent>
 				</Card>
 			</Grid>
+			{Boolean(user?.salary_data) && (
+				<Grid item xs={12} md={12} lg={12}>
+					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
+						<CardContent sx={{ p: '30px' }}>
+							<Typography variant="h5">Детализация последних зарплат</Typography>
+							<Box sx={{ overflow: 'auto', width: { xs: '280px', sm: 'auto' } }}>
+								<Table
+									sx={{
+										whiteSpace: 'nowrap',
+										mt: 2,
+									}}
+								>
+									<TableHead>
+										<TableRow>
+											<TableCell>
+												<Typography variant="subtitle2" fontWeight={600}>
+													Дата
+												</Typography>
+											</TableCell>
+											<TableCell>
+												<Typography variant="subtitle2" fontWeight={600}>
+													Оклад, руб. <br />
+													Премия, руб.
+												</Typography>
+											</TableCell>
+											<TableCell>
+												<Typography variant="subtitle2" fontWeight={600}>
+													Итого З/П, руб.
+												</Typography>
+											</TableCell>
+											<TableCell>
+												<Typography variant="subtitle2" fontWeight={600}>
+													Разница, %
+												</Typography>
+											</TableCell>
+										</TableRow>
+									</TableHead>
+									<TableBody>
+										{user?.salary_data?.map((product, id) => {
+											const prev = user?.salary_data?.[id + 1];
+											const final = (product.salary || 0) + (product.bonuse || 0);
+											const prevFinal = (prev?.salary || 0) + (prev?.bonuse || 0);
+											const precent: number = prev
+												? +(((final - prevFinal) / prevFinal) * 100).toFixed(0)
+												: 0;
+
+											return (
+												<TableRow key={product?.date || user?.position_days || 0 + id}>
+													<TableCell>
+														<Typography
+															sx={{
+																fontSize: '15px',
+																fontWeight: '500',
+															}}
+														>
+															{ruMoment(product.date || '').isValid()
+																? ruMoment(product.date || '').format('DD.MM.YYYY')
+																: null}
+														</Typography>
+													</TableCell>
+													<TableCell>
+														<Box
+															sx={{
+																display: 'flex',
+																alignItems: 'center',
+															}}
+														>
+															<Box>
+																<Typography variant="subtitle2" fontWeight={600}>
+																	{moneyFormat(product.salary, 2)}
+																</Typography>
+																<Typography
+																	color="textSecondary"
+																	sx={{
+																		fontSize: '13px',
+																	}}
+																>
+																	{moneyFormat(product.bonuse, 2)}
+																</Typography>
+															</Box>
+														</Box>
+													</TableCell>
+													<TableCell>
+														<Typography color="textSecondary" variant="subtitle2" fontWeight={400}>
+															{moneyFormat(final)}
+														</Typography>
+													</TableCell>
+													<TableCell>
+														<Typography
+															color={precent > 0 ? 'green' : 'red'}
+															variant="subtitle2"
+															fontWeight={400}
+														>
+															{precent}
+														</Typography>
+													</TableCell>
+												</TableRow>
+											);
+										})}
+									</TableBody>
+								</Table>
+							</Box>
+						</CardContent>
+					</Card>
+				</Grid>
+			)}
 		</Grid>
 	);
 };

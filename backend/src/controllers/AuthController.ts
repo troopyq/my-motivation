@@ -33,9 +33,10 @@ class AuthController {
 
 			logtime(req, req.body);
 
-			const [[user]] = await pool.query<RowDataPacket[]>(`
-					SELECT * from users WHERE login='${login}'
-				`);
+			const [[user]] = await pool.execute<RowDataPacket[]>(
+				`SELECT * from users WHERE login = ?`,
+				[login],
+			);
 
 			if (!user) return res.status(401).json({ status: false, error: 'Пользователь не найден' });
 
@@ -49,7 +50,7 @@ class AuthController {
 
 			const token = generateAccessToken(user.id, employee.role);
 			// res.cookie('token', token, {maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true})
-			res.cookie('token', token, { maxAge: 30 * 1000, httpOnly: true });
+			res.cookie('token', token, { maxAge: 60 * 60 * 1000, httpOnly: true });
 			return res.status(200).json({ status: true, data: { token, id: user.id } });
 		} catch (e) {
 			error(req, res, 500, e);
