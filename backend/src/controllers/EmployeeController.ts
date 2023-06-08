@@ -6,9 +6,9 @@ class EmployeeController {
 	async employees(req: Request, res: Response) {
 		try {
 			const [row] = await pool.query(`
-				SELECT * from employee
+				SELECT * from employees
 			`);
-			res.status(200).json({status: true, data: row?.[0]})
+			res.status(200).json({status: true, data: row})
 		} catch (e: any) {
 			error(req, res, 500, e);
 		}

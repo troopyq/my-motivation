@@ -17,7 +17,8 @@ export type AuthParams = {
 
 export type AuthResponse = { token: string };
 
-export const generateAccessToken = (id, roles) => {
+// создание JWT токена
+export const generateAccessToken = (id: number, roles: string) => {
 	const payload = {
 		id,
 		roles,
@@ -45,12 +46,11 @@ class AuthController {
 			if (!isValid) return res.status(401).json({ status: false, error: 'Неверный пароль' });
 
 			const [[employee]] = await pool.query<RowDataPacket[]>(`
-			SELECT * from employee WHERE id='${user.id}'
+			SELECT * from employees WHERE id='${user.id}'
 		 `);
 
 			const token = generateAccessToken(user.id, employee.role);
-			// res.cookie('token', token, {maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true})
-			res.cookie('token', token, { maxAge: 60 * 60 * 1000, httpOnly: true });
+			res.cookie('token', token, {maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true})
 			return res.status(200).json({ status: true, data: { token, id: user.id } });
 		} catch (e) {
 			error(req, res, 500, e);

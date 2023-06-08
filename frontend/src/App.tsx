@@ -58,7 +58,6 @@ function App() {
 				{token ? (
 					<>
 						<Route path="/" element={<PageLayout />}>
-							<Route path="dashboard" element={<Dashboard />} />
 							<Route path="new-dashboard" element={<NewDashboard />} />
 							<Route path="rating" element={<RatingPage />} />
 							<Route path="profile/:id" element={<Profile />} />

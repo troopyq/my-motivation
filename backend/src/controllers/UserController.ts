@@ -18,6 +18,10 @@ interface ISalaryUpdate extends Request {
 	body: Salary;
 }
 
+interface ILike extends Request {
+	body: { id: number };
+}
+
 const getUserInfoFromDB = async (
 	id?: number | string,
 ): Promise<Partial<IRole & IEmployee & ISalary> | null> => {
@@ -25,7 +29,7 @@ const getUserInfoFromDB = async (
 		if (!id) return null;
 
 		const [[employee]] = await pool.query<IEmployee[]>(`
-		SELECT * from employee WHERE id='${id}'
+		SELECT * from employees WHERE id='${id}'
 	 `);
 
 		if (!employee) return null;
@@ -34,8 +38,8 @@ const getUserInfoFromDB = async (
 		SELECT * from roles WHERE id='${employee.position_id}'
 	 `);
 
-		const [[salaryes]] = await pool.query<ISalary[]>(`
-		SELECT * from salaryes WHERE employee_id='${employee.position_id}'
+		const [[salaries]] = await pool.query<ISalary[]>(`
+		SELECT * from salaries WHERE employee_id='${employee.position_id}'
 	 `);
 
 		const { id: _id, ...roles } = role;
@@ -43,7 +47,7 @@ const getUserInfoFromDB = async (
 		return {
 			...employee,
 			...roles,
-			salary_data: JSON.parse(salaryes?.salary_data as string),
+			salary_data: JSON.parse(salaries?.salary_data as string),
 		};
 	} catch (error) {
 		logger(error);
@@ -70,7 +74,7 @@ const UserController = {
 		}
 	},
 
-	profile: async (req: Request, res: Response) => {
+	async profile(req: Request, res: Response) {
 		try {
 			const { id } = req.query;
 			const tokenData = getToken(req);
@@ -102,7 +106,7 @@ const UserController = {
 			logger(`${upd({ salary_data })}`);
 
 			const resp = await pool.query(`
-        UPDATE salaryes SET
+        UPDATE salaries SET
 				salary_data = ${upd({ salary_data }, true)}
         WHERE employee_id=${employee_id}
        `);
@@ -117,6 +121,24 @@ const UserController = {
 		try {
 			const [employees] = await pool.query<IShortEmployee[]>(`
 		SELECT * from searchEmployees
+		`);
+
+			res.status(200).json({ status: true, data: employees } as Res);
+		} catch (e) {
+			error(req, res, 500, e);
+		}
+	},
+
+	async like(req: ILike, res: Response) {
+		try {
+			const { id } = req.body;
+
+			const [user] = await pool.execute<IShortEmployee[]>(`
+			SELECT likes from searchEmployees
+			`);
+
+			const [employees] = await pool.execute<IShortEmployee[]>(`
+		UPDATE employees SET
 		`);
 
 			res.status(200).json({ status: true, data: employees } as Res);

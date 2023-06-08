@@ -11,18 +11,18 @@ const router = express.Router();
 
 // Auth
 router.post('/auth', AuthController.auth);
-router.post('/check', AuthController.checkAuth);
 router.get('/check', AuthController.checkAuth);
 
 // Logout
 router.get('/logout', AuthController.logout);
 
 // Employees, Profile
-router.get('/employees', EmployeeController.employees);
+router.get('/employees', authMiddleware, EmployeeController.employees);
 router.get('/user', authMiddleware, UserController.getUser);
 router.get('/profile', authMiddleware, UserController.profile);
 router.get('/searchUsers', authMiddleware, UserController.searchEmployees);
 router.post('/updateSalary', authMiddleware, UserController.updateSalary);
+router.post('/like', authMiddleware, UserController.like);
 
 // Rating
 router.post('/updateRating', authMiddleware, RatingController.updateRating);
