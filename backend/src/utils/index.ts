@@ -13,8 +13,11 @@ export const getToken = <T extends Record<string, unknown> = Partial<JWTData & {
 			parseCookie(req?.headers?.cookie)?.token || req?.headers?.authorization?.split(' ')?.[1];
 
 		const decodeData = jwt.verify(token, config.get('secret')) as any;
+		const data = jwt.decode(token, config.get('secret')) as any;
+		console.log(data);
+		
 
-		return { ...decodeData, token };
+		return { ...decodeData, ...data, token };
 	} catch (error) {
 		//@ts-ignore
 		return { token: null };

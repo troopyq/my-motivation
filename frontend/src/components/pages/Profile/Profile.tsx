@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Response } from 'store/types';
 import { Loading } from 'ui';
-import api from 'utils/api/idnex';
+import api from 'utils/api';
 import { AxiosError } from 'axios';
 import { Likes, RatingData, User } from 'store/core/types';
 import { moneyFormat, ruMoment, sklonenie } from 'utils';
@@ -278,6 +278,26 @@ export const Profile: React.FC = () => {
 					</CardContent>
 				</Card>
 			</Grid>
+			{user?.target_completion ? (
+				<Grid item xs={7} md={4} lg={3}>
+					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>
+						<CardContent sx={{ display: 'flex', p: '30px', minHeight: 120 }}>
+							<Box display="flex" gap={5} flexGrow={1} alignItems="center">
+								<Box display="flex" flexDirection="column" gap={3}>
+									<Box display="flex" flexDirection="column" gap={1}>
+										<Box display="flex" gap={1.2} alignItems="center">
+											<Typography variant="h4">План выполнен на</Typography>
+										</Box>
+										<Typography color="primary" variant="h4">
+											{user?.target_completion || 0}%
+										</Typography>
+									</Box>
+								</Box>
+							</Box>
+						</CardContent>
+					</Card>
+				</Grid>
+			) : null}
 			{Boolean(user?.salary_data) && (
 				<Grid item xs={12} md={12} lg={12}>
 					<Card sx={{ padding: 0, overflow: 'visible' }} elevation={8} variant={undefined}>

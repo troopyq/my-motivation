@@ -17,7 +17,7 @@ import { RatingData } from 'store/core/types';
 import { Response } from 'store/types';
 import { makeStyles } from 'tss-react/mui';
 import { ErrorCard, Loading } from 'ui';
-import api from 'utils/api/idnex';
+import api from 'utils/api';
 
 export const topColors = ['#ffc132', '#bebebe', '#cb7e16'];
 

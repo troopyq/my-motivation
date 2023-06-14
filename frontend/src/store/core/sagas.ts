@@ -3,7 +3,7 @@ import { GeneratorSagaType, Response } from '../types';
 import { coreActions } from './actions';
 import { AuthParams, AuthResponse, User } from './types';
 import { call } from '../../utils/saga';
-import api from '../../utils/api/idnex';
+import api from '../../utils/api';
 import { AxiosError } from 'axios';
 
 function* getUser({ payload: id }: { payload: number | undefined }) {

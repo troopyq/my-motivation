@@ -9,6 +9,7 @@ import { logger, logtime } from '../utils/logtime';
 import { parseCookie } from '../utils/cookie';
 import { Res } from '../types';
 import { getToken } from '../utils';
+import { IRole } from 'src/types/employee';
 
 export type AuthParams = {
 	login: string;
@@ -41,7 +42,12 @@ class AuthController {
 
 			if (!user) return res.status(401).json({ status: false, error: 'Пользователь не найден' });
 
+			console.log('password - ', password);
+			console.log('password2 - ', user.password);
+			
 			const isValid = bcrypt.compareSync(password, user.password);
+
+			
 
 			if (!isValid) return res.status(401).json({ status: false, error: 'Неверный пароль' });
 
@@ -49,7 +55,11 @@ class AuthController {
 			SELECT * from employees WHERE id='${user.id}'
 		 `);
 
-			const token = generateAccessToken(user.id, employee.role);
+		 const [[role]] = await pool.query<IRole[]>(`
+		 SELECT * from roles WHERE id='${employee.position_id}'
+		`);
+
+			const token = generateAccessToken(user.id, role.role_name);
 			res.cookie('token', token, {maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true})
 			return res.status(200).json({ status: true, data: { token, id: user.id } });
 		} catch (e) {

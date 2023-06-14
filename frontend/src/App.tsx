@@ -1,9 +1,9 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthPage, NewDashboard, RatingPage } from './components/pages';
 import { coreSelectors } from './store/core/selectors';
 import { useEffect, useState } from 'react';
-import api from 'utils/api/idnex';
+import api from 'utils/api';
 import { coreActions } from 'store/core/actions';
 import { Box, CircularProgress } from '@mui/material';
 import { PageLayout } from 'components/layout';
@@ -53,7 +53,7 @@ function App() {
 		);
 
 	return (
-		<BrowserRouter basename="/">
+		<HashRouter basename="/">
 			<Routes>
 				{token ? (
 					<>
@@ -73,7 +73,7 @@ function App() {
 					</>
 				)}
 			</Routes>
-		</BrowserRouter>
+		</HashRouter>
 	);
 }
 

@@ -80,6 +80,8 @@ const UserController = {
 			const tokenData = getToken(req);
 			const isSelfData = Number(id) === tokenData?.id;
 
+			logger(tokenData)
+
 			let employee = await getUserInfoFromDB(id as string);
 
 			if (!employee)
@@ -98,8 +100,9 @@ const UserController = {
 				return res.status(200).json({ status: true, data: { ...employee } } as Res);
 			}
 
-			const { bonuses, salary, target_completion, vacation_days, salary_data, ...profile } =
-				employee;
+			let { bonuses, salary, target_completion, vacation_days, salary_data, ...profile } = employee;
+
+			if (tokenData.roles === 'RKM') profile = { ...profile, target_completion };
 
 			return res.status(200).json({ status: true, data: { ...profile } } as Res);
 		} catch (e) {

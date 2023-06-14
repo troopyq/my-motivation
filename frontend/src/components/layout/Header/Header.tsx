@@ -13,7 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ExitToApp from '@mui/icons-material/ExitToApp';
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from 'react';
-import api from 'utils/api/idnex';
+import api from 'utils/api';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useDispatch, useSelector } from 'react-redux';
 import { coreActions } from 'store/core/actions';

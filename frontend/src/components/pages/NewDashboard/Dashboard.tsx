@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { RatingData } from 'store/core/types';
 import { Response } from 'store/types';
 import { ErrorCard, Loading } from 'ui';
-import api from 'utils/api/idnex';
+import api from 'utils/api';
 import { useSelector } from 'react-redux';
 import { coreSelectors } from 'store/core/selectors';
 

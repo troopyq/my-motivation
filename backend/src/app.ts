@@ -10,7 +10,7 @@ const app = express();
 
 const corsOptions = {
   credentials: true,
-  origin: '*'
+  origin: ['http://localhost:3002', 'https://dinemko.ru', 'http://dinemko.ru', '*']
 }
 
 app.use(cors(corsOptions));
@@ -18,12 +18,12 @@ app.use(express.json());
 
 app.use('/api', router);
 
-if (process.env.NODE_ENV === 'production') {
-	app.use(express.static(path.resolve(__dirname, '..', 'frontend', 'dist')));
+// if (process.env.NODE_ENV === 'production') {
+	app.use(express.static(path.resolve(__dirname, '..', '..', 'frontend', 'dist')));
 	app.get('*', (req, res) => {
-		res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
+		res.sendFile(path.join(__dirname, '..', '..', 'frontend', 'dist', 'index.html'));
 	});
-}
+// }
 
 try {
   app.listen(PORT, () => console.log('SERVER STARTED ON PORT ' + PORT));
