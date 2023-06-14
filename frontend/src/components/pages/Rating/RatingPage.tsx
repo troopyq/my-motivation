@@ -162,7 +162,7 @@ export const RatingPage: React.FC = () => {
 											<Rating
 												name="rating"
 												onClick={stopProp}
-												onChange={(e, value) => onRating(value, user.employee_id)}
+												onChange={(_e, value) => onRating(value, user.employee_id)}
 												value={parseFloat(user?.stars?.toString() || '0')}
 												precision={0.5}
 												readOnly={!isRKM}

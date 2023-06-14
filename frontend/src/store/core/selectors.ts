@@ -1,5 +1,5 @@
 import { ApplicationState, LoadingState } from '../types';
-import { CoreState, User } from './types';
+import { User } from './types';
 
 const titleHeader = (state: ApplicationState): string => state.core.header.title;
 

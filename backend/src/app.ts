@@ -9,7 +9,7 @@ const app = express();
 
 const corsOptions = {
   credentials: true,
-  origin: 'http://localhost:3002'
+  origin: '*'
 }
 
 app.use(cors(corsOptions));

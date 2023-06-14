@@ -1,6 +1,6 @@
 import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/material/styles';
-import { Stack, Typography, Avatar, Grid, PaletteColor } from '@mui/material';
+import { Stack, Typography, Avatar, Grid } from '@mui/material';
 import SouthEastIcon from '@mui/icons-material/SouthEast';
 import DashboardCard from 'components/shared/DashboardCard';
 import { ApexOptions } from 'apexcharts';
@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { RatingData } from 'store/core/types';
 import { moneyFormat, ruMoment } from 'utils';
 
-const MonthlyEarnings: React.FC<{ data: RatingData }> = ({ data }) => {
+const MonthlyEarnings: React.FC<{ data: RatingData | null }> = ({ data }) => {
 	// chart color
 	const theme = useTheme();
 	const secondary = theme.palette.secondary.main;
@@ -17,14 +17,14 @@ const MonthlyEarnings: React.FC<{ data: RatingData }> = ({ data }) => {
 	const success = theme.palette.success.main;
 
 	const months = useMemo(
-		() => data.month_sales?.map((el) => ruMoment(el?.date || '').format('MMMM')),
+		() => data?.month_sales?.map((el) => ruMoment(el?.date || '').format('MMMM')) || [],
 		[data],
 	);
 
 	console.log(months);
 	console.log(data);
 
-	const values = useMemo(() => data.month_sales?.map((el) => el.sales as number), [data]);
+	const values = useMemo(() => data?.month_sales?.map((el) => el.sales as number) || [], [data]);
 
 	const precent: number = values
 		? +(

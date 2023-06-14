@@ -8,14 +8,14 @@ import { RatingData } from 'store/core/types';
 import { moneyFormat, ruMoment } from 'utils';
 import { useMemo } from 'react';
 
-const YearlyBreakup: React.FC<{ data: RatingData }> = ({ data }) => {
+const YearlyBreakup: React.FC<{ data: RatingData | null }> = ({ data }) => {
 	// chart color
 	const theme = useTheme();
 	const successlight = theme.palette.success.main;
 	const error = theme.palette.error.main;
 
 	const years = useMemo(
-		() => data.year_sales?.map((el) => ruMoment(el?.date || '').format('YYYY')),
+		() => data?.year_sales?.map((el) => ruMoment(el?.date || '').format('YYYY')) || [],
 		[data],
 	);
 
@@ -31,7 +31,7 @@ const YearlyBreakup: React.FC<{ data: RatingData }> = ({ data }) => {
 		[],
 	);
 
-	const values = useMemo(() => data.year_sales?.map((el) => el.sales as number), [data]);
+	const values = useMemo(() => data?.year_sales?.map((el) => el.sales as number) || [], [data]);
 
 	const seriescolumnchart = values;
 
