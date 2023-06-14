@@ -26,7 +26,7 @@ function App() {
 					dispatch(coreActions.setTokenAuth(localToken));
 					dispatch(coreActions.getUser(res.data?.data?.id));
 				})
-				.catch((e) => {
+				.catch(() => {
 					localStorage.removeItem('token');
 					dispatch(coreActions.clearToken());
 					dispatch(coreActions.authFailed(''));

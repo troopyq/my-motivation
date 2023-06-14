@@ -1,12 +1,9 @@
-import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import DashboardCard from 'components/shared/DashboardCard';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 
 const SalesOverview = () => {
-
-
 	// chart color
 	const theme = useTheme();
 	const primary = theme.palette.primary.main;
