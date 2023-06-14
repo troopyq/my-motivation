@@ -9,8 +9,9 @@ module.exports = {
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module', },
-  plugins: ['react-refresh','@typescript-eslint'],
+  plugins: ['react-refresh','@typescript-eslint', 'tss-unused-classes'],
   rules: {
+		'tss-unused-classes/unused-classes': 'warn',
     'react-refresh/only-export-components': 'warn',
     'max-lines': ['error', 200],
     'padding-line-between-statements': [

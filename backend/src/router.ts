@@ -1,13 +1,34 @@
 import express from 'express';
-import { GetController } from './controllers/index';
+import {
+	AuthController,
+	EmployeeController,
+	RatingController,
+	UserController,
+} from './controllers/index';
+import { authMiddleware } from './middleware/authMiddleware';
 
 const router = express.Router();
 
-router.use(function timeLog(req, res, next) {
-	console.log('Time: ', Date.now());
-	next();
-});
+// Auth
+router.post('/auth', AuthController.auth);
+router.get('/check', AuthController.checkAuth);
 
-router.get('/employees', GetController.employees);
+// Logout
+router.get('/logout', AuthController.logout);
+
+// Employees, Profile
+router.get('/employees', authMiddleware, EmployeeController.employees);
+router.get('/user', authMiddleware, UserController.getUser);
+router.get('/profile', authMiddleware, UserController.profile);
+router.get('/searchUsers', authMiddleware, UserController.searchEmployees);
+router.post('/updateSalary', authMiddleware, UserController.updateSalary);
+router.post('/like', authMiddleware, UserController.like);
+
+// Rating
+router.post('/updateRating', authMiddleware, RatingController.updateRating);
+router.get('/rating', authMiddleware, RatingController.getRaging);
+
+router.get('/generatePassword', AuthController.generatePassword);
+
 
 export { router };
