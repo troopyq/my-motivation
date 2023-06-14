@@ -17,7 +17,6 @@ import { RatingData } from 'store/core/types';
 import { Response } from 'store/types';
 import { makeStyles } from 'tss-react/mui';
 import { ErrorCard, Loading } from 'ui';
-import { ruMoment } from 'utils';
 import api from 'utils/api/idnex';
 
 export const topColors = ['#ffc132', '#bebebe', '#cb7e16'];

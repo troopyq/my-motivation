@@ -56,8 +56,8 @@ const RatingController = {
 
 			const [rating] = await pool.query<IUpdateRating[]>(`
         SELECT * FROM rating 
+				${employee_id ? `WHERE employee_id=${employee_id}` : ''}
         `);
-			// ${employee_id ? `WHERE employee_id=${employee_id}` : ''}
 
 			const [employees] = await pool.query<IUpdateRating[]>(`
         SELECT * FROM searchEmployees 

@@ -7,7 +7,7 @@ import api from 'utils/api/idnex';
 import { coreActions } from 'store/core/actions';
 import { Box, CircularProgress } from '@mui/material';
 import { PageLayout } from 'components/layout';
-import { Profile, Dashboard } from 'components/pages';
+import { Profile } from 'components/pages';
 
 function App() {
 	const dispatch = useDispatch();
@@ -21,7 +21,7 @@ function App() {
 		const localToken = localStorage.getItem('token');
 		if (localToken) {
 			api
-				.post('/check')
+				.get('/check')
 				.then((res) => {
 					dispatch(coreActions.setTokenAuth(localToken));
 					dispatch(coreActions.getUser(res.data?.data?.id));

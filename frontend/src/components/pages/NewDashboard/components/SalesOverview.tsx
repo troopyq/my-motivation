@@ -5,12 +5,7 @@ import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 
 const SalesOverview = () => {
-	// select
-	const [month, setMonth] = React.useState('1');
 
-	const handleChange = (event: any) => {
-		setMonth(event?.target?.value);
-	};
 
 	// chart color
 	const theme = useTheme();

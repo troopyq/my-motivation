@@ -23,7 +23,7 @@ import { Response } from 'store/types';
 import { Loading } from 'ui';
 import api from 'utils/api/idnex';
 import { AxiosError } from 'axios';
-import { RatingData, User } from 'store/core/types';
+import { Likes, RatingData, User } from 'store/core/types';
 import { moneyFormat, ruMoment, sklonenie } from 'utils';
 import { CrownIcon } from 'assets/icons/Crown';
 import { topColors } from '../Rating';
@@ -95,6 +95,25 @@ export const Profile: React.FC = () => {
 			});
 	}, [params.id]);
 
+	const onLike = (id: any) => {
+		api
+			.post<Response<Likes>>('like', { id })
+			.then((res) => {
+				if (res.data?.status) {
+					setState((prev) => ({
+						...prev,
+						data: {
+							...prev?.data!,
+							likes: res.data?.data || { you_like: false, count: 0 },
+						},
+					}));
+				}
+			})
+			.catch((err: AxiosError<Response>) => {
+				console.log('err likes - ', err);
+			});
+	};
+
 	if (state.loading) return <Loading />;
 
 	if (!state.loading && state.error) {
@@ -163,12 +182,11 @@ export const Profile: React.FC = () => {
 									{user?.block}
 								</Typography>
 								<Box display="flex" alignItems="center" gap={0.5}>
-									<IconButton color="secondary">
-										<ThumbUpOffAltIcon />
-										{/* <ThumbUpAltIcon /> */}
+									<IconButton onClick={() => onLike(user?.id)} color="secondary">
+										{user?.likes?.you_like ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
 									</IconButton>
 									<Typography variant="body1" fontWeight={700}>
-										{2}
+										{user?.likes?.count || 0}
 									</Typography>
 								</Box>
 							</Box>
@@ -252,7 +270,6 @@ export const Profile: React.FC = () => {
 											{user?.position_days}
 										</Typography>
 										<Typography variant="h5">
-											{' '}
 											{sklonenie(+(user?.position_days || 0), ['день', 'дня', 'дней'])} в компании
 										</Typography>
 									</Box>

@@ -120,7 +120,6 @@ export const Header: React.FC<{ open: boolean; onToggle: VoidFunction }> = ({ op
 					onOpen={() => setIsOpen(true)}
 					disableCloseOnSelect={false}
 					onClose={(e, reason) => {
-						// if (reason === 'selectOption') return;
 						setIsOpen(false);
 					}}
 					renderOption={(prop, option) => {

@@ -1,16 +1,40 @@
 import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/material/styles';
-import { Stack, Typography, Avatar, Grid } from '@mui/material';
+import { Stack, Typography, Avatar, Grid, PaletteColor } from '@mui/material';
 import SouthEastIcon from '@mui/icons-material/SouthEast';
 import DashboardCard from 'components/shared/DashboardCard';
 import { ApexOptions } from 'apexcharts';
+import { useMemo } from 'react';
+import { RatingData } from 'store/core/types';
+import { moneyFormat, ruMoment } from 'utils';
 
-const MonthlyEarnings = () => {
+const MonthlyEarnings: React.FC<{ data: RatingData }> = ({ data }) => {
 	// chart color
 	const theme = useTheme();
 	const secondary = theme.palette.secondary.main;
 	const secondarylight = '#65c9f4';
-	const errorlight = theme.palette.success.main;
+	const error = theme.palette.error.main;
+	const success = theme.palette.success.main;
+
+	const months = useMemo(
+		() => data.month_sales?.map((el) => ruMoment(el?.date || '').format('MMMM')),
+		[data],
+	);
+
+	console.log(months);
+	console.log(data);
+
+	const values = useMemo(() => data.month_sales?.map((el) => el.sales as number), [data]);
+
+	const precent: number = values
+		? +(
+				((values?.[values.length - 1] - values?.[values.length - 2]) /
+					values?.[values.length - 2]) *
+					100 || 0
+		  ).toFixed(0)
+		: 0;
+
+	const isPositive = precent >= 0;
 
 	// chart
 	const optionscolumnchart: ApexOptions = {
@@ -50,26 +74,14 @@ const MonthlyEarnings = () => {
 		},
 
 		xaxis: {
-			categories: [
-				'Январь',
-				'Февраль',
-				'Март',
-				'Апрель',
-				'Май',
-				'Июнь',
-				'Июль',
-				'Август',
-				'Сентябрь',
-				'Ноябрь',
-				'Декабрь',
-			],
+			categories: months,
 		},
 	};
 	const seriescolumnchart: ApexAxisChartSeries = [
 		{
 			name: 'Продаж, руб.',
 			color: secondary,
-			data: [30000, 32040, 31324, 33430, 30320, 32200],
+			data: values || [],
 			group: 'year',
 		},
 	];
@@ -90,17 +102,24 @@ const MonthlyEarnings = () => {
 		>
 			<>
 				<Typography variant="h3" fontWeight="700" mt="-20px">
-					32 200 руб.
+					{moneyFormat(values?.[values.length - 1])} руб.
 				</Typography>
 				<Stack direction="row" spacing={1} my={1} alignItems="center">
-					<Avatar sx={{ bgcolor: errorlight, width: 27, height: 27, transform: 'rotate(-90deg)' }}>
+					<Avatar
+						sx={{
+							bgcolor: isPositive ? success : error,
+							width: 27,
+							height: 27,
+							transform: `rotate(${isPositive ? '-90' : '90'}deg)`,
+						}}
+					>
 						{
 							//@ts-ignore
 							<SouthEastIcon width={20} color="#FA896B" />
 						}
 					</Avatar>
 					<Typography variant="subtitle2" fontWeight="600">
-						+9%
+						{precent}%
 					</Typography>
 					<Typography variant="subtitle2" color="textSecondary">
 						за последний месяц

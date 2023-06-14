@@ -1,29 +1,58 @@
 import Chart from 'react-apexcharts';
 import { useTheme } from '@mui/material/styles';
-import { Grid, Stack, Typography, Avatar } from '@mui/material';
+import { Grid, Stack, Typography, Avatar, PaletteColor } from '@mui/material';
 import DashboardCard from 'components/shared/DashboardCard';
 import SouthEastIcon from '@mui/icons-material/SouthEast';
 import { ApexOptions } from 'apexcharts';
+import { RatingData } from 'store/core/types';
+import { moneyFormat, ruMoment } from 'utils';
+import { useMemo } from 'react';
 
-const YearlyBreakup = () => {
+const YearlyBreakup: React.FC<{ data: RatingData }> = ({ data }) => {
 	// chart color
 	const theme = useTheme();
-	const primary = theme.palette.primary.main;
-	const primarylight = '#ecf2ff';
 	const successlight = theme.palette.success.main;
+	const error = theme.palette.error.main;
+
+	const years = useMemo(
+		() => data.year_sales?.map((el) => ruMoment(el?.date || '').format('YYYY')),
+		[data],
+	);
+
+	const colors = useMemo(
+		() => [
+			...Object.keys(theme.palette.primary)
+				.slice(0, 2)
+				.map((e: unknown) => theme.palette.primary?.[e as keyof PaletteColor]),
+			...Object.keys(theme.palette.primary)
+				.slice(0, 2)
+				.map((e: unknown) => theme.palette.secondary?.[e as keyof PaletteColor]),
+		],
+		[],
+	);
+
+	const values = useMemo(() => data.year_sales?.map((el) => el.sales as number), [data]);
+
+	const seriescolumnchart = values;
+
+	const precent: number = values
+		? +(((values?.[0] - values?.[1]) / values?.[1]) * 100 || 0).toFixed(0)
+		: 0;
+
+	const isPositive = precent >= 0;
 
 	// chart
 	const optionscolumnchart: ApexOptions = {
 		chart: {
 			type: 'donut',
-
 			foreColor: '#adb0bb',
 			toolbar: {
 				show: false,
 			},
 			height: 155,
 		},
-		colors: [primary, primarylight, '#F9F9FD'],
+		labels: years,
+		colors: colors,
 		plotOptions: {
 			pie: {
 				startAngle: 0,
@@ -58,7 +87,6 @@ const YearlyBreakup = () => {
 			},
 		],
 	};
-	const seriescolumnchart = [378560, 425300];
 
 	return (
 		<DashboardCard title="Продажи за текущий год">
@@ -66,12 +94,17 @@ const YearlyBreakup = () => {
 				{/* column */}
 				<Grid item xs={6} sm={6}>
 					<Typography variant="h3" fontWeight="700" mb={3}>
-						425 300 руб.
+						{moneyFormat(values?.[0])} руб.
 					</Typography>
 					<Stack direction="column" spacing={1} mt={1} alignItems="flex-start">
 						<Grid>
 							<Avatar
-								sx={{ bgcolor: successlight, width: 27, height: 27, transform: 'rotate(-90deg)' }}
+								sx={{
+									bgcolor: isPositive ? successlight : error,
+									width: 27,
+									height: 27,
+									transform: `rotate(${isPositive ? '-90' : '90'}deg)`,
+								}}
 							>
 								{
 									//@ts-ignore
@@ -79,7 +112,7 @@ const YearlyBreakup = () => {
 								}
 							</Avatar>
 							<Typography variant="subtitle2" fontWeight="600">
-								+14%
+								{precent}%
 							</Typography>
 						</Grid>
 						<Typography variant="subtitle2" color="textSecondary">
@@ -87,22 +120,32 @@ const YearlyBreakup = () => {
 						</Typography>
 					</Stack>
 					<Stack spacing={3} mt={5} direction="row">
-						<Stack direction="row" spacing={1} alignItems="center">
-							<Avatar
-								sx={{ width: 9, height: 9, bgcolor: primary, svg: { display: 'none' } }}
-							></Avatar>
-							<Typography variant="subtitle2" color="textSecondary">
-								2022
-							</Typography>
-						</Stack>
-						<Stack direction="row" spacing={1} alignItems="center">
-							<Avatar
-								sx={{ width: 9, height: 9, bgcolor: primarylight, svg: { display: 'none' } }}
-							></Avatar>
-							<Typography variant="subtitle2" color="textSecondary">
-								2023
-							</Typography>
-						</Stack>
+						{years?.map((year, i) => {
+							const colors = [
+								...Object.keys(theme.palette.primary)
+									.slice(0, 2)
+									.map((e: unknown) => theme.palette.primary?.[e as keyof PaletteColor]),
+								...Object.keys(theme.palette.primary)
+									.slice(0, 2)
+									.map((e: unknown) => theme.palette.secondary?.[e as keyof PaletteColor]),
+							];
+
+							return (
+								<Stack key={year + i} direction="row" spacing={1} alignItems="center">
+									<Avatar
+										sx={{
+											width: 9,
+											height: 9,
+											bgcolor: colors?.[i],
+											svg: { display: 'none' },
+										}}
+									></Avatar>
+									<Typography variant="subtitle2" color="textSecondary">
+										{year}
+									</Typography>
+								</Stack>
+							);
+						})}
 					</Stack>
 				</Grid>
 				{/* column */}

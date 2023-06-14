@@ -15,6 +15,14 @@ export interface Employee {
 	position_days: number;
 	block: Nstring;
 	avatar_img: Nstring;
+	likes:
+		| string[]
+		| string
+		| null
+		| {
+				you_like: boolean;
+				count: number;
+		  };
 }
 
 export interface IEmployee extends Employee, RowDataPacket {}
@@ -31,4 +39,9 @@ export interface ShortEmployee {
 	avatar_img: Nstring;
 }
 
+export interface ILikesShort {
+	likes: null | string;
+}
+
 export interface IShortEmployee extends ShortEmployee, RowDataPacket {}
+export interface ILikes extends ILikesShort, RowDataPacket {}

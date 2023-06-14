@@ -24,10 +24,16 @@ export type User = {
 	role_name?: Nstring;
 	block?: Nstring;
 	salary_data?: { date: Nstring; salary: Nnumber; bonuse: Nnumber }[] | null;
+	likes?: Likes;
 
 	isLoaded: '' | LoadingState;
 	token?: Nstring;
 	[K: string]: unknown;
+};
+
+export type Likes = {
+	you_like: boolean;
+	count: number;
 };
 
 export interface RatingData {
@@ -35,9 +41,9 @@ export interface RatingData {
 	employee_id: number;
 	stars: Nnumber;
 	execution_plan: Nnumber;
-	month_sales: Record<string, unknown> | null;
-	year_sales: Record<string, unknown> | null;
-	last_sales: Record<string, unknown> | null;
+	month_sales: Record<string, unknown>[] | null;
+	year_sales: Record<string, unknown>[] | null;
+	last_sales: Record<string, unknown>[] | null;
 	avatar_img: Nstring;
 	fio: Nstring;
 	balls: Nnumber;

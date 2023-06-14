@@ -3,8 +3,6 @@ import { Grid, Box } from '@mui/material';
 // components
 import SalesOverview from './components/SalesOverview';
 import YearlyBreakup from './components/YearlyBreakup';
-import RecentTransactions from './components/RecentTransactions';
-import ProductPerformance from './components/ProductPerformance';
 import MonthlyEarnings from './components/MonthlyEarnings';
 import { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
@@ -12,25 +10,29 @@ import { RatingData } from 'store/core/types';
 import { Response } from 'store/types';
 import { ErrorCard, Loading } from 'ui';
 import api from 'utils/api/idnex';
+import { useSelector } from 'react-redux';
+import { coreSelectors } from 'store/core/selectors';
 
 export const NewDashboard = () => {
-	const [data, setData] = useState<RatingData[]>([]);
+	const { id } = useSelector(coreSelectors.user);
+	const [data, setData] = useState<RatingData | null>(null);
 	const [error, setError] = useState<Nstring>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 
 	useEffect(() => {
-		api
-			.get<Response<RatingData[]>>('/rating')
-			.then((res) => {
-				if (res.data.status) {
-					setData(res.data?.data || []);
-				}
-			})
-			.catch((err: AxiosError<Response>) => {
-				setError(err.response?.data?.error || 'Не удалось загрузить рейтинг. Повторите позже');
-			})
-			.finally(() => setLoading(false));
-	}, []);
+		if (id)
+			api
+				.get<Response<RatingData[]>>('/rating', { params: { employee_id: id } })
+				.then((res) => {
+					if (res.data.status) {
+						setData((res.data?.data?.[0] as RatingData) || []);
+					}
+				})
+				.catch((err: AxiosError<Response>) => {
+					setError(err.response?.data?.error || 'Не удалось загрузить рейтинг. Повторите позже');
+				})
+				.finally(() => setLoading(false));
+	}, [id]);
 
 	if (error) return <ErrorCard err={error} />;
 
@@ -40,15 +42,15 @@ export const NewDashboard = () => {
 		<Box>
 			<Grid container spacing={3}>
 				<Grid item xs={12} md={8} lg={8}>
-					<SalesOverview />
+					<SalesOverview data={data} />
 				</Grid>
 				<Grid item xs={12} md={4} lg={4}>
 					<Grid container spacing={3}>
 						<Grid item xs={6} md={12}>
-							<YearlyBreakup />
+							<YearlyBreakup data={data} />
 						</Grid>
 						<Grid item xs={6} md={12}>
-							<MonthlyEarnings />
+							<MonthlyEarnings data={data} />
 						</Grid>
 					</Grid>
 				</Grid>

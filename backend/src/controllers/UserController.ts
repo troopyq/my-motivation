@@ -4,7 +4,7 @@ import { error } from '../utils/error';
 import { RowDataPacket } from 'mysql2/promise';
 import { logger, logtime } from '../utils/logtime';
 import { Res } from '../types';
-import { Employee, IEmployee, IRole, IShortEmployee } from '../types/employee';
+import { Employee, IEmployee, ILikes, IRole, IShortEmployee } from '../types/employee';
 import { getToken, upd } from '../utils';
 
 interface Salary {
@@ -80,11 +80,19 @@ const UserController = {
 			const tokenData = getToken(req);
 			const isSelfData = Number(id) === tokenData?.id;
 
-			const employee = await getUserInfoFromDB(id as string);
+			let employee = await getUserInfoFromDB(id as string);
 
-			console.log(employee);
 			if (!employee)
 				return res.status(400).json({ status: false, error: 'Сотрудник не найден' } as Res);
+
+			employee.likes =
+				(employee.likes || []) &&
+				(JSON.parse((employee.likes as string) || '[]')?.map((el) => el?.toString()) as string[]);
+
+			employee.likes = {
+				you_like: employee.likes?.includes(id as string),
+				count: employee.likes?.length || 0,
+			};
 
 			if (isSelfData) {
 				return res.status(200).json({ status: true, data: { ...employee } } as Res);
@@ -133,15 +141,31 @@ const UserController = {
 		try {
 			const { id } = req.body;
 
-			const [user] = await pool.execute<IShortEmployee[]>(`
-			SELECT likes from searchEmployees
+			let [[user]] = await pool.execute<ILikes[]>(`
+			SELECT likes from employees WHERE id=${id}
 			`);
 
+			if (!user.likes) user.likes = '[]';
+
+			let likes = JSON.parse(user.likes)?.map((el) => Number(el)) as number[];
+
+			if (likes.includes(id)) {
+				likes = likes.filter((el) => el !== id);
+			} else {
+				likes.push(id);
+			}
+			logger(likes);
+
 			const [employees] = await pool.execute<IShortEmployee[]>(`
-		UPDATE employees SET
+		UPDATE employees SET likes = ${upd({ likes }, true)} WHERE id = ${id}
 		`);
 
-			res.status(200).json({ status: true, data: employees } as Res);
+			const resp = {
+				you_like: likes.includes(id),
+				count: likes?.length || 0,
+			};
+
+			res.status(200).json({ status: true, data: resp } as Res);
 		} catch (e) {
 			error(req, res, 500, e);
 		}
